@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scent Match — Studio Meeve</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#A92A31;--black:#1A1A1A;--gray-100:#F4F4F1;--gray-200:#E6E6E3;
+  --gray-400:#9C9C98;--gray-600:#5F5F5B;--white:#FFFFFF;--t:200ms ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{background:var(--white);color:var(--black);font-family:'Inter',sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+.shell{width:100%;max-width:540px;padding:48px 24px 72px}
+.brand{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gray-400);margin-bottom:48px;display:block}
+
+/* ── INTRO ── */
+.intro-setup{font-size:13px;color:var(--gray-400);letter-spacing:.02em;margin-bottom:14px;line-height:1.5}
+.intro h1{font-size:clamp(32px,8vw,52px);font-weight:800;line-height:1.05;letter-spacing:-.025em;margin-bottom:16px;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase}
+.intro h1 em{font-style:normal;color:var(--red)}
+.intro-sub{font-size:14px;line-height:1.6;color:var(--gray-600);max-width:340px;margin-bottom:36px}
+
+/* ── BUTTONS ── */
+.btn-black{display:inline-block;background:var(--black);color:var(--white);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:14px 32px;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:background var(--t);text-decoration:none}
+.btn-black:hover{background:var(--gray-600)}
+.btn-red{display:inline-block;background:var(--red);color:var(--white);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:14px 28px;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:background var(--t);text-decoration:none}
+.btn-red:hover{background:#8b1f25}
+.btn-outline{background:var(--white);color:var(--black);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:14px 28px;cursor:pointer;border:.5px solid var(--gray-200);font-family:'Inter',sans-serif;transition:border-color var(--t)}
+.btn-outline:hover{border-color:var(--black)}
+.btn-full{display:block;width:100%;background:var(--black);color:var(--white);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:15px;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:background var(--t)}
+.btn-full:hover{background:var(--gray-600)}
+.btn-ghost{display:block;text-align:center;font-size:11px;color:var(--gray-400);margin-top:14px;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;background:none;border:none;font-family:'Inter',sans-serif;width:100%;transition:color var(--t)}
+.btn-ghost:hover{color:var(--black)}
+
+/* ── PROGRESS ── */
+.progress{margin-bottom:40px;display:none}
+.progress.on{display:block}
+.progress-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:10px;display:flex;justify-content:space-between}
+.progress-track{height:1px;background:var(--gray-200)}
+.progress-fill{height:1px;background:var(--black);transition:width 400ms ease}
+
+/* ── QUESTIONS ── */
+.q{display:none}.q.on{display:block}
+.q-eye{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:14px}
+.q-text{font-size:clamp(18px,4vw,23px);font-weight:500;line-height:1.3;letter-spacing:-.01em;margin-bottom:32px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{background:var(--white);border:.5px solid var(--gray-200);padding:16px 20px;text-align:left;cursor:pointer;font-family:'Inter',sans-serif;font-size:14px;color:var(--black);transition:border-color var(--t),background var(--t);display:flex;align-items:flex-start;gap:14px}
+.opt:hover{border-color:var(--black);background:var(--gray-100)}
+.opt.on{border-color:var(--black);background:var(--black);color:var(--white)}
+.opt-radio{width:18px;height:18px;border:.5px solid currentColor;border-radius:50%;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center}
+.opt.on .opt-radio{background:var(--red);border-color:var(--red)}
+.opt-dot{width:6px;height:6px;background:var(--white);border-radius:50%;opacity:0}
+.opt.on .opt-dot{opacity:1}
+.opt-body{display:flex;flex-direction:column;gap:5px}
+.opt-main{font-weight:500;line-height:1.3}
+.opt-sub{font-size:12px;color:var(--gray-400);line-height:1.4}
+.opt.on .opt-sub{color:rgba(255,255,255,.55)}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:32px}
+.btn-back{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-400);background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;padding:0;transition:color var(--t)}
+.btn-back:hover{color:var(--black)}
+.btn-next{font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:var(--black);color:var(--white);border:none;padding:13px 28px;cursor:pointer;font-family:'Inter',sans-serif;opacity:.22;pointer-events:none;transition:opacity var(--t),background var(--t)}
+.btn-next.on{opacity:1;pointer-events:auto}
+.btn-next.on:hover{background:var(--gray-600)}
+
+/* ── EMAIL ── */
+.email-step,.loading-step,.result-step{display:none}
+.email-step.on,.loading-step.on,.result-step.on{display:block}
+.step-eye{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:14px}
+.email-step h2{font-size:clamp(20px,4vw,27px);font-weight:500;line-height:1.2;letter-spacing:-.015em;margin-bottom:12px}
+.email-step>p{font-size:14px;color:var(--gray-600);line-height:1.6;margin-bottom:24px}
+.email-in{width:100%;border:.5px solid var(--gray-200);padding:15px 18px;font-size:15px;font-family:'Inter',sans-serif;color:var(--black);background:var(--white);outline:none;transition:border-color var(--t);margin-bottom:10px;border-radius:0;-webkit-appearance:none}
+.email-in:focus{border-color:var(--black)}
+.email-in::placeholder{color:var(--gray-400)}
+.field-err{font-size:12px;color:var(--red);margin-bottom:12px;display:none}
+.field-err.on{display:block}
+.consent{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px;cursor:pointer}
+.chk{width:18px;height:18px;border:.5px solid var(--gray-400);flex-shrink:0;margin-top:1px;position:relative;transition:border-color var(--t),background var(--t)}
+.chk.on{background:var(--black);border-color:var(--black)}
+.chk.on::after{content:'';display:block;width:4px;height:8px;border-right:1.5px solid var(--white);border-bottom:1.5px solid var(--white);transform:rotate(45deg);position:absolute;top:3px;left:5px}
+.consent-label{font-size:13px;color:var(--gray-600);line-height:1.5;user-select:none}
+.privacy{font-size:11px;color:var(--gray-400);line-height:1.6;margin-bottom:20px}
+.privacy a{color:var(--gray-600);text-decoration:underline;text-underline-offset:2px;transition:color var(--t)}
+.privacy a:hover{color:var(--black)}
+
+/* ── LOADING ── */
+.loading-step{text-align:center;padding:60px 0}
+.loading-text{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gray-400);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* ── RESULT ── */
+.r-eye{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:6px}
+.r-name{font-size:clamp(36px,9vw,56px);font-weight:700;letter-spacing:-.01em;line-height:1;margin-bottom:6px;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase}
+.r-notes{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-400);margin-bottom:24px}
+.r-img-wrap{width:100%;aspect-ratio:3/4;overflow:hidden;background:var(--gray-100);margin-bottom:28px}
+.r-img-wrap img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+.r-div{width:32px;height:1px;background:var(--red);margin-bottom:20px}
+.r-family{display:inline-block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-600);border:.5px solid var(--gray-200);padding:6px 12px;margin-bottom:18px}
+.r-desc{font-size:15px;line-height:1.7;color:var(--gray-600);margin-bottom:24px;max-width:420px}
+.r-structure{margin-bottom:24px}
+.r-structure-title{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gray-400);margin-bottom:10px}
+.r-layers{display:flex;flex-direction:column;gap:6px}
+.r-layer{display:flex;gap:12px;font-size:12px;line-height:1.5}
+.r-layer-label{width:44px;flex-shrink:0;color:var(--gray-400);letter-spacing:.06em;text-transform:uppercase;font-size:10px;padding-top:1px}
+.r-layer-notes{color:var(--gray-600)}
+.r-format-label{font-size:11px;color:var(--gray-400);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.r-format{display:inline-block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;border:.5px solid var(--gray-200);padding:7px 14px;color:var(--gray-600);margin-bottom:28px}
+.r-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:48px}
+
+/* ── SCENT CARD SECTION ── */
+.card-section{margin-top:40px;padding-top:32px;border-top:.5px solid var(--gray-200);margin-bottom:48px}
+.card-section-header{margin-bottom:20px}
+.card-section-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:6px}
+.card-section-sub{font-size:13px;color:var(--gray-600);line-height:1.5}
+
+/* The card itself — rendered at 300×375px (4:5), exported 3× */
+.scent-card{
+  width:300px;height:375px;background:#FFFFFF;
+  border:.5px solid #E6E6E3;
+  padding:22px 20px 18px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  font-family:'Inter',sans-serif;
+  margin:0 auto 20px;
+  position:relative;
+}
+.card-header{display:flex;flex-direction:column;gap:8px}
+.card-brand-row{display:flex;align-items:center;justify-content:space-between}
+.card-brand-text{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:#9C9C98}
+.card-brand-line{height:1px;background:#E6E6E3;margin-top:6px}
+.card-type{font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--red);margin-top:4px}
+
+.card-middle{flex:1;display:flex;flex-direction:column;justify-content:center;padding:12px 0}
+.card-aroma-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:48px;line-height:.95;letter-spacing:-.01em;text-transform:uppercase;color:#1A1A1A;margin-bottom:4px}
+.card-aroma-notes{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#9C9C98;margin-bottom:12px}
+.card-red-line{width:36px;height:1px;background:var(--red);margin-bottom:12px}
+.card-statement{font-size:12.5px;line-height:1.55;color:#5F5F5B;margin-bottom:12px;max-width:240px}
+.card-tags{font-size:9px;letter-spacing:.06em;color:#9C9C98;line-height:1.6}
+
+.card-structure{display:flex;flex-direction:column;gap:3px;margin-bottom:10px}
+.card-layer{display:flex;gap:8px;font-size:8px;color:#C7C7C3;line-height:1.4}
+.card-layer-num{font-size:7px;color:var(--red);flex-shrink:0;width:10px;font-variant-numeric:tabular-nums;margin-top:1px}
+.card-layer-text{color:#C7C7C3}
+
+.card-footer{display:flex;flex-direction:column;gap:6px}
+.card-footer-line{height:.5px;background:#E6E6E3}
+.card-footer-row{display:flex;justify-content:space-between;align-items:center}
+.card-url{font-size:8px;letter-spacing:.06em;color:#C7C7C3}
+
+/* Card action buttons */
+.card-actions{display:flex;gap:10px;justify-content:center}
+.btn-card{font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:12px 24px;cursor:pointer;font-family:'Inter',sans-serif;transition:all var(--t);border:none}
+.btn-card-save{background:var(--black);color:var(--white)}
+.btn-card-save:hover{background:var(--gray-600)}
+.btn-card-share{background:var(--white);color:var(--black);border:.5px solid var(--gray-200)}
+.btn-card-share:hover{border-color:var(--black)}
+.card-hint{text-align:center;font-size:11px;color:var(--gray-400);margin-top:12px;letter-spacing:.04em}
+
+/* ── ALTERNATIVES ── */
+.r-alts{border-top:.5px solid var(--gray-200);padding-top:32px}
+.r-alts-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:20px}
+.alt-list{display:flex;flex-direction:column;gap:20px}
+.alt{display:flex;gap:16px;align-items:flex-start;padding-bottom:20px;border-bottom:.5px solid var(--gray-200)}
+.alt:last-child{border-bottom:none;padding-bottom:0}
+.alt-img{width:72px;height:96px;object-fit:cover;object-position:center top;background:var(--gray-100);flex-shrink:0}
+.alt-body{flex:1}
+.alt-name{font-size:15px;font-weight:700;letter-spacing:-.01em;margin-bottom:2px;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase}
+.alt-notes{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-400);margin-bottom:6px}
+.alt-why{font-size:12px;color:var(--red);font-style:italic;margin-bottom:8px;line-height:1.4}
+.alt-desc{font-size:13px;color:var(--gray-600);line-height:1.55;margin-bottom:8px}
+.alt-link{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--red);text-decoration:none;border-bottom:.5px solid currentColor;padding-bottom:1px;transition:color var(--t)}
+.alt-link:hover{color:#8b1f25}
+
+@media(max-width:480px){
+  .shell{padding:36px 20px 48px}
+  .r-ctas,.card-actions{flex-direction:column}
+  .btn-red,.btn-outline,.btn-card{text-align:center;display:block}
+  .scent-card{width:280px;height:350px}
+  .card-aroma-name{font-size:42px}
+}
+</style>
+</head>
+<body>
+<main class="shell" role="main">
+<span class="brand">Studio Meeve — Scent Match</span>
+
+<!-- INTRO -->
+<section class="intro" id="intro">
+  <p class="intro-setup">Não existe aroma certo para todo mundo.</p>
+  <h1>Existe o certo<br>para <em>você</em>.</h1>
+  <p class="intro-sub">Responda sete perguntas. Descubra o seu.</p>
+  <button class="btn-black" onclick="start()">Começar</button>
+</section>
+
+<!-- PROGRESS -->
+<div class="progress" id="prog">
+  <div class="progress-label"><span id="prog-label">Pergunta 1 de 7</span><span id="prog-pct">0%</span></div>
+  <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+</div>
+
+<!-- Q1 -->
+<div class="q" id="q1">
+  <div class="q-eye">Formato</div>
+  <div class="q-text">Como você quer que o aroma exista no espaço?</div>
+  <div class="opts" id="opts-q1">
+    <button class="opt" onclick="pick('q1','vela',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Vela</span><span class="opt-sub">Chama acesa. Objeto no espaço. Duração que você controla.</span></span></button>
+    <button class="opt" onclick="pick('q1','spray',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Home Spray</span><span class="opt-sub">Um gesto. O ambiente muda na hora.</span></span></button>
+    <button class="opt" onclick="pick('q1','difusor',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Difusor de varetas</span><span class="opt-sub">Contínuo, sem ação. O aroma simplesmente está lá.</span></span></button>
+  </div>
+  <div class="nav"><span></span><button class="btn-next" id="next-q1" onclick="goto(2)">Continuar</button></div>
+</div>
+
+<!-- Q2 -->
+<div class="q" id="q2">
+  <div class="q-eye">Sensação</div>
+  <div class="q-text">O que você quer sentir quando o aroma está no ambiente?</div>
+  <div class="opts" id="opts-q2">
+    <button class="opt" onclick="pick('q2','relaxar',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Leveza e silêncio</span><span class="opt-sub">Limpo, discreto, arejado.</span></span></button>
+    <button class="opt" onclick="pick('q2','energia',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Energia e frescor</span><span class="opt-sub">Ativo, limpo, vibrante.</span></span></button>
+    <button class="opt" onclick="pick('q2','aconchego',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Profundidade e calor</span><span class="opt-sub">Denso, envolvente, com temperatura.</span></span></button>
+  </div>
+  <div class="nav"><button class="btn-back" onclick="goto(1)">Voltar</button><button class="btn-next" id="next-q2" onclick="goto(3)">Continuar</button></div>
+</div>
+
+<!-- Q3 -->
+<div class="q" id="q3">
+  <div class="q-eye">Temperatura</div>
+  <div class="q-text">Como você prefere sentir o aroma?</div>
+  <div class="opts" id="opts-q3">
+    <button class="opt" onclick="pick('q3','quente',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Quente e envolvente</span><span class="opt-sub">Amadeirado, especiado, com corpo.</span></span></button>
+    <button class="opt" onclick="pick('q3','fresco',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Fresco e leve</span><span class="opt-sub">Limpo, arejado, direto.</span></span></button>
+    <button class="opt" onclick="pick('q3','equilibrado',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Equilibrado</span><span class="opt-sub">Nem leve demais, nem intenso demais.</span></span></button>
+  </div>
+  <div class="nav"><button class="btn-back" onclick="goto(2)">Voltar</button><button class="btn-next" id="next-q3" onclick="goto(4)">Continuar</button></div>
+</div>
+
+<!-- Q4 -->
+<div class="q" id="q4">
+  <div class="q-eye">Doçura</div>
+  <div class="q-text">Quanta doçura cabe no seu aroma?</div>
+  <div class="opts" id="opts-q4">
+    <button class="opt" onclick="pick('q4','nenhuma',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Nenhuma</span><span class="opt-sub">Prefiro seco, limpo, sem doçura.</span></span></button>
+    <button class="opt" onclick="pick('q4','leve',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Leve</span><span class="opt-sub">Um toque. Não uma declaração.</span></span></button>
+    <button class="opt" onclick="pick('q4','marcante',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Marcante</span><span class="opt-sub">Doçura deliberada, presente, evidente.</span></span></button>
+  </div>
+  <div class="nav"><button class="btn-back" onclick="goto(3)">Voltar</button><button class="btn-next" id="next-q4" onclick="goto(5)">Continuar</button></div>
+</div>
+
+<!-- Q5 -->
+<div class="q" id="q5">
+  <div class="q-eye">Perfil olfativo</div>
+  <div class="q-text">Qual perfil de aroma mais te atrai?</div>
+  <div class="opts" id="opts-q5">
+    <button class="opt" onclick="pick('q5','amadeirado',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Amadeirados e secos</span><span class="opt-sub">Couro, cedro, madeira.</span></span></button>
+    <button class="opt" onclick="pick('q5','especiado',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Especiados e quentes</span><span class="opt-sub">Canela, pimenta, notas orientais.</span></span></button>
+    <button class="opt" onclick="pick('q5','fresco',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Frescos e naturais</span><span class="opt-sub">Ervas, cítrico, sal marinho, verde.</span></span></button>
+    <button class="opt" onclick="pick('q5','floral',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Florais e suaves</span><span class="opt-sub">Floral limpo, macio, levemente almiscarado.</span></span></button>
+    <button class="opt" onclick="pick('q5','frutal',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Frutados e luminosos</span><span class="opt-sub">Fruta real, vibrante, com frescor.</span></span></button>
+  </div>
+  <div class="nav"><button class="btn-back" onclick="goto(4)">Voltar</button><button class="btn-next" id="next-q5" onclick="goto(6)">Continuar</button></div>
+</div>
+
+<!-- Q6 -->
+<div class="q" id="q6">
+  <div class="q-eye">Intensidade</div>
+  <div class="q-text">Como você quer que o aroma ocupe o ambiente?</div>
+  <div class="opts" id="opts-q6">
+    <button class="opt" onclick="pick('q6','suave',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Suave e discreto</span><span class="opt-sub">Perfume leve, perceptível de perto.</span></span></button>
+    <button class="opt" onclick="pick('q6','medida',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Na medida certa</span><span class="opt-sub">Se espalha bem, sem dominar.</span></span></button>
+    <button class="opt" onclick="pick('q6','intenso',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Intenso e marcante</span><span class="opt-sub">Preenche o ambiente antes de você entrar.</span></span></button>
+  </div>
+  <div class="nav"><button class="btn-back" onclick="goto(5)">Voltar</button><button class="btn-next" id="next-q6" onclick="goto(7)">Continuar</button></div>
+</div>
+
+<!-- Q7 -->
+<div class="q" id="q7">
+  <div class="q-eye">Ambiente</div>
+  <div class="q-text">Qual ambiente você quer perfumar?</div>
+  <div class="opts" id="opts-q7">
+    <button class="opt" onclick="pick('q7','sala',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Sala / living</span></span></button>
+    <button class="opt" onclick="pick('q7','quarto',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Quarto</span></span></button>
+    <button class="opt" onclick="pick('q7','banheiro',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Banheiro / lavabo</span></span></button>
+    <button class="opt" onclick="pick('q7','escritorio',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Escritório</span></span></button>
+    <button class="opt" onclick="pick('q7','hall',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Hall / entrada</span></span></button>
+    <button class="opt" onclick="pick('q7','naosei',this)"><span class="opt-radio"><span class="opt-dot"></span></span><span class="opt-body"><span class="opt-main">Ainda não sei</span></span></button>
+  </div>
+  <div class="nav"><button class="btn-back" onclick="goto(6)">Voltar</button><button class="btn-next" id="next-q7" onclick="toEmail()">Ver resultado</button></div>
+</div>
+
+<!-- EMAIL -->
+<div class="email-step" id="emailStep">
+  <div class="step-eye">Quase lá</div>
+  <h2>Seu resultado está pronto.</h2>
+  <p>Insira seu e-mail para revelar seu aroma. Sem spam.</p>
+  <input type="email" class="email-in" id="emailIn" placeholder="seu@email.com"/>
+  <div class="field-err" id="emailErr">E-mail inválido. Tente novamente.</div>
+  <label class="consent" onclick="toggleConsent()">
+    <span class="chk" id="chk" role="checkbox" aria-checked="false" tabindex="0"></span>
+    <span class="consent-label">Quero receber lançamentos e recomendações exclusivas.</span>
+  </label>
+  <p class="privacy">Seus dados ficam com a Meeve. Você cancela quando quiser. <a href="https://www.studiomeeve.com.br/privacidade/" target="_blank" rel="noopener">Política de Privacidade</a>.</p>
+  <button class="btn-full" onclick="submitAndReveal()">Revelar meu aroma</button>
+  <button class="btn-ghost" onclick="showLoading()">Prefiro não informar</button>
+</div>
+
+<!-- LOADING -->
+<div class="loading-step" id="loadingStep">
+  <div class="loading-text">Analisando suas respostas</div>
+</div>
+
+<!-- RESULT -->
+<div class="result-step" id="resultStep">
+  <div class="r-eye">Seu aroma</div>
+  <div class="r-name" id="rName"></div>
+  <div class="r-notes" id="rNotes"></div>
+  <div class="r-img-wrap"><img id="rImg" src="" alt="" loading="lazy"/></div>
+  <div class="r-div"></div>
+  <div class="r-family" id="rFamily"></div>
+  <div class="r-desc" id="rDesc"></div>
+  <div class="r-structure">
+    <div class="r-structure-title">Estrutura olfativa</div>
+    <div class="r-layers" id="rLayers"></div>
+  </div>
+  <div class="r-format-label">Formato recomendado</div>
+  <div class="r-format" id="rFormat"></div>
+  <div class="r-ctas">
+    <a class="btn-red" id="rCTA" href="#" target="_blank">Comprar</a>
+    <button class="btn-outline" onclick="restart()">Refazer o quiz</button>
+  </div>
+
+  <!-- ALTERNATIVES -->
+  <div class="r-alts">
+    <div class="r-alts-label">Outras leituras do seu perfil</div>
+    <div class="alt-list" id="altList"></div>
+  </div>
+
+  <!-- SCENT CARD -->
+  <div class="card-section">
+    <div class="card-section-header">
+      <div class="card-section-label">Seu Scent Card</div>
+      <div class="card-section-sub">Salve como imagem e compartilhe seu perfil olfativo.</div>
+    </div>
+
+    <div id="scentCard" class="scent-card">
+      <!-- header -->
+      <div class="card-header">
+        <div class="card-brand-row">
+          <span class="card-brand-text">Studio Meeve / Scent Match</span>
+        </div>
+        <div class="card-brand-line"></div>
+        <div class="card-type">Seu aroma</div>
+      </div>
+
+      <!-- middle -->
+      <div class="card-middle">
+        <div class="card-aroma-name" id="cardName"></div>
+        <div class="card-aroma-notes" id="cardNotes"></div>
+        <div class="card-red-line"></div>
+        <div class="card-statement" id="cardStatement"></div>
+        <div class="card-tags" id="cardTags"></div>
+      </div>
+
+      <!-- structure -->
+      <div class="card-structure" id="cardStructure"></div>
+
+      <!-- footer -->
+      <div class="card-footer">
+        <div class="card-footer-line"></div>
+        <div class="card-footer-row">
+          <span class="card-url">studiomeeve.com.br</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-actions">
+      <button class="btn-card btn-card-save" onclick="downloadCard()">Salvar card</button>
+      <button class="btn-card btn-card-share" onclick="shareCard()">Compartilhar</button>
+    </div>
+    <div class="card-hint">Formato ideal para Instagram Stories e Feed.</div>
+  </div>
+</div>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+// ── CONFIG ────────────────────────────────────
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyjWiIGm_exfbKgsYRFn7pKS5bJMQj76rGCipdGag2tZONFsfaGi9MItnEIZ43hNVmaKQ/exec';
+const BASE       = 'https://www.studiomeeve.com.br';
+const CDN        = 'https://dcdn-us.mitiendanube.com/stores/003/946/250/products';
+const TOTAL      = 7;
+
+// ── IMAGENS POR FORMATO × AROMA ──────────────
+const IMGS = {
+  epure: {
+    vela:    'studiomeevescentedcandleepurefigflowersandalwood-a412aff0e710cf91ac17775112061500-640-0.webp',
+    difusor: 'studiomeevereeddiffuserepurefigflowersandalwood-8bf4be6242069ad05f17775113731628-640-0.webp',
+    spray:   'studiomeevehomesprayepurefigflowersandalwood-947d4f6de70d8f71c617775112346445-640-0.webp'
+  },
+  oree: {
+    vela:    'studiomeevesce-tedcandleoreegrapefruitcinnamonn-1841b76b59b861809217775114096724-640-0.webp',
+    difusor: 'studiomeevereeddiffuseroreegrapefruitcinnamonn-602f239f73574d13a717775114554994-640-0.webp',
+    spray:   'studiomeevehomesprayoreegrapefruitcinnamonn-3a960809a13ea7d53217775114330559-640-0.webp'
+  },
+  cabane: {
+    vela:    'studiomeevescentedcandlecabaneleathercedar-8e57ce199fd02b439217775111154649-640-0.webp',
+    difusor: 'studiomeevereeddiffusercabaneleathercedar-040d87ae4458199e1f17775111722362-640-0.webp',
+    spray:   'studiomeevehomespraycabaneleathercedar-2624d26f243206493e17775111431444-640-0.webp'
+  },
+  audace: {
+    vela:    'studiomeevescentedcandleaudaceraspberrylychee-5966f230b1ec937e4e17775108700421-640-0.webp',
+    difusor: 'studiomeevereeddiffuseraudaceraspberrylychee-6c5a4fa331a504566d17775109583294-640-0.webp',
+    spray:   'studiomeevehomesprayaudaceraspberrylychee-2094e59293030474e417775109309835-640-0.webp'
+  },
+  moka: {
+    vela:    'studiomeevescentedcandlemokacoffeespices-36e9c52b8b7260ee5417775105853665-640-0.webp',
+    difusor: 'studiomeevereeddiffusormokacoffeespices-cee93ff86fb13ca17217775106882263-640-0.webp',
+    spray:   'studiomeevehomespraymokacoffeespices-5acc04d0d76507a17217775106584160-640-0.webp'
+  },
+  ravin: {
+    vela:    'studiomeevescentedcandleravinbergamotmoscowmule-7b9f537c443eff7efa17775110154892-640-0.webp',
+    difusor: 'studiomeevereeddiffuserravinbergamotmoscowmule-534c54ff0494a6a7e717775110649304-640-0.webp',
+    spray:   'studiomeevehomesprayravinbergamotmoscowmule-9b89dcde451dc85e6717775110398408-640-0.webp'
+  },
+  brise: {
+    vela:    'studiomeevescentedcandlebriselemongrassseasalt-35f8052e6522ea599d17775107386376-640-0.webp',
+    difusor: 'studiomeevereeddiffuserbriselemongrassseasalt-d44c524c40d563e68417775108054048-640-0.webp',
+    spray:   'studiomeevehomespraybriselemongrassseasalt-264723723a3823448017775107698233-640-0.webp'
+  }
+};
+
+// ── AROMAS ───────────────────────────────────
+const TIEBREAK = ['oree','epure','brise','ravin','cabane','audace','moka'];
+
+const AROMAS = {
+  epure: {
+    name:'Épure', notes:'Fig Flower & Sandalwood',
+    family:'Floral almiscarado',
+    desc:'Floral limpo e íntimo, com textura úmida, frescor sutil e profundidade cremosa. Começa limpo, quase inocente — e de repente fica mais quente, mais sério.',
+    short:'Floral limpo e íntimo, com profundidade cremosa.',
+    topo:'pêssego · cassis · acorde verde',
+    corpo:'rosa damascena · folha de figo · lírio do vale · frésia · coco',
+    fundo:'sândalo · baunilha',
+    slug:'epure-fig-flower-sandalwood',
+    statement:'Você entende que o silêncio também ocupa espaço.',
+    tags:'floral · almiscarado · suave · limpo · elegante'
+  },
+  oree: {
+    name:'Orée', notes:'Grapefruit & Cinnamon',
+    family:'Cítrica especiada',
+    desc:'O frescor cortante da grapefruit contra o calor envolvente da canela. Dois opostos em tensão constante — refrescante e acolhedor, ácido e quente ao mesmo tempo.',
+    short:'Cítrico vibrante com calor especiado. Contraste real.',
+    topo:'limão siciliano · lavanda · pomelo · eucalipto',
+    corpo:'vetiver · canela · palo santo · goji · manga',
+    fundo:'musk · âmbar · fava tonka',
+    slug:'oree-grapefruit-cinnamon',
+    statement:'Você prefere contraste ao conforto óbvio.',
+    tags:'cítrico · especiado · vibrante · quente · luminoso'
+  },
+  cabane: {
+    name:'Cabane', notes:'Leather & Cedar',
+    family:'Amadeirada',
+    desc:'Couro, madeira escura, pimenta preta. Nada aqui foi feito para ser leve. Cabane não tenta ser acolhedora — ela é firme, estruturada, quente sem ser doce.',
+    short:'Amadeirado estruturado, adulto e seco. Sem concessão.',
+    topo:'figo · groselha negra · lima da pérsia · lavanda',
+    corpo:'cedro · patchouli · pimenta preta · notas verdes · couro',
+    fundo:'musk · musgo de carvalho · fava tonka',
+    slug:'cabane-leather-cedar',
+    statement:'Você assina o espaço antes de dizer uma palavra.',
+    tags:'amadeirado · couro · seco · estruturado · profundo'
+  },
+  audace: {
+    name:'Audace', notes:'Raspberry & Lychee',
+    family:'Floral frutal',
+    desc:'Framboesa, lichia, pimenta rosa. A vivacidade da fruta madura com nuances especiadas — doce, mas marcado pela acidez característica das frutas. Ousado sem ser óbvio.',
+    short:'Frutal exótico e ousado. Doçura com acidez real.',
+    topo:'framboesa · pimenta rosa · lichia',
+    corpo:'cravo · flores brancas · peônia · ameixa',
+    fundo:'musk · baunilha',
+    slug:'audace-raspberry-lychee',
+    statement:'Você não pede desculpa pelo que escolhe.',
+    tags:'frutal · floral · sensual · luminoso · ousado'
+  },
+  moka: {
+    name:'Moka', notes:'Coffee & Spices',
+    family:'Oriental gourmand',
+    desc:'Café recém-passado, especiarias escuras, uma cremosidade discreta. Não tenta imitar cafeteria — é gourmand adulto: denso, intenso, visceral.',
+    short:'Café, especiarias e conforto denso. Um gourmand adulto.',
+    topo:'canela · pimenta · cravo · anis',
+    corpo:'café · chocolate · leite',
+    fundo:'baunilha · caramelo · musk · âmbar',
+    slug:'moka-coffee-spices',
+    statement:'Você quer conforto, mas não abre mão de profundidade.',
+    tags:'gourmand · café · especiado · denso · intenso'
+  },
+  ravin: {
+    name:'Ravin', notes:'Bergamot & Moscow Mule',
+    family:'Cítrica amadeirada',
+    desc:'Bergamota e pimenta rosa no topo, couro e vetiver no fundo. Começa fresco, limpo, decidido — mas não demora a revelar uma base mais densa, terrosa e sóbria.',
+    short:'Frescor cítrico com base amadeirada e terrosa.',
+    topo:'bergamota · pimenta rosa · sálvia',
+    corpo:'couro · vetiver · gengibre',
+    fundo:'patchouli · ambroxan · semente de cacau',
+    slug:'ravin-bergamot-moscow-mule',
+    statement:'Você é urbano sem precisar explicar.',
+    tags:'cítrico · amadeirado · fresco · urbano · cosmopolita'
+  },
+  brise: {
+    name:'Brise', notes:'Lemongrass & Sea Salt',
+    family:'Aromático marinho',
+    desc:'Sal marinho, capim-limão, sálvia e uma base de madeira aveludada. Frescor mineral com textura salgada e natural — a brisa que entra pela janela sem pedir licença.',
+    short:'Marinho, mineral e verde. Frescor limpo com textura salgada.',
+    topo:'sal marinho · sálvia · capim-limão · bergamota · manjericão',
+    corpo:'notas oceânicas · figo · íris',
+    fundo:'madeira aveludada · cedro · musk',
+    slug:'brise-lemongrass-sea-salt',
+    statement:'Para você, limpeza também é estética.',
+    tags:'marinho · mineral · verde · salino · limpo'
+  }
+};
+
+const FORMATS = {
+  vela:    {label:'Vela 190g',                pre:'vela-aromatica',     suf:'190g'},
+  spray:   {label:'Home Spray 250ml',         pre:'home-spray',         suf:'250ml'},
+  difusor: {label:'Difusor de varetas 250ml', pre:'difusor-de-varetas', suf:'250ml'}
+};
+
+// ── JUSTIFICATIVAS (por resposta, independente do aroma) ──
+// Prioridade de exibição: família > doçura > intensidade > temperatura > sensação > ambiente
+const JUSTIFY_PRIORITY = ['q5','q4','q6','q3','q2','q7'];
+
+const JUSTIFY = {
+  q2:{
+    relaxar:  'porque você busca leveza e silêncio no ambiente',
+    energia:  'porque você busca energia e frescor no ambiente',
+    aconchego:'porque você busca profundidade e calor no ambiente'
+  },
+  q3:{
+    quente:     'porque você se atrai por aromas quentes e envolventes',
+    fresco:     'porque você prefere aromas frescos e leves',
+    equilibrado:'porque você busca equilíbrio, sem excessos'
+  },
+  q4:{
+    nenhuma: 'porque você prefere aromas sem doçura',
+    leve:    'porque você gosta de um toque leve de doçura',
+    marcante:'porque você se atrai por doçura marcante'
+  },
+  q5:{
+    amadeirado:'porque você se atrai por notas amadeiradas e secas',
+    especiado: 'porque você se atrai por notas especiadas e quentes',
+    fresco:    'porque você se atrai por notas frescas e naturais',
+    floral:    'porque você se atrai por notas florais e suaves',
+    frutal:    'porque você se atrai por notas frutadas e luminosas'
+  },
+  q6:{
+    suave:  'porque você prefere um aroma suave e discreto',
+    medida: 'porque você busca um aroma presente na medida certa',
+    intenso:'porque você quer um aroma intenso e marcante'
+  },
+  q7:{
+    sala:      'porque você quer perfumar a sala',
+    quarto:    'porque você quer perfumar o quarto',
+    banheiro:  'porque você quer perfumar o banheiro',
+    escritorio:'porque você quer perfumar o escritório',
+    hall:      'porque você quer perfumar o hall de entrada'
+  }
+};
+
+// Retorna candidatos de justificativa ordenados por peso (maior primeiro),
+// com desempate pela prioridade de pergunta (família > doçura > intensidade > ...).
+function getJustificationCandidates(aromaKey){
+  const candidates=[];
+  ['q2','q3','q4','q5','q6','q7'].forEach(q=>{
+    const ans=A[q]; if(!ans) return;
+    const weights=SCORING[q][ans]||{};
+    const pts=weights[aromaKey]||0;
+    const text=(JUSTIFY[q]||{})[ans];
+    if(!text || pts<=0) return;
+    candidates.push({text, pts, priority:JUSTIFY_PRIORITY.indexOf(q)});
+  });
+  candidates.sort((a,b)=> b.pts!==a.pts ? b.pts-a.pts : a.priority-b.priority);
+  return candidates;
+}
+
+// Escolhe a melhor justificativa para um aroma que ainda não tenha sido usada
+// por outro aroma no mesmo resultado — evita duas leituras com o mesmo "porque".
+function pickJustification(aromaKey, usedTexts){
+  const candidates=getJustificationCandidates(aromaKey);
+  for(const c of candidates){
+    if(!usedTexts.has(c.text)) return c.text;
+  }
+  // Todas as opções já foram usadas por outro aroma: fallback distinto por aroma
+  return 'porque também é uma leitura coerente com o perfil que você descreveu';
+}
+
+// ── SCORING ───────────────────────────────────
+const SCORING = {
+  q2:{relaxar:{brise:1,epure:2,ravin:1},energia:{brise:2,oree:2,ravin:1,audace:2},aconchego:{cabane:2,moka:2}},
+  q3:{quente:{brise:-1,oree:1,cabane:2,moka:2,audace:1},fresco:{brise:2,epure:2,ravin:1,moka:-1},equilibrado:{oree:2,ravin:1,audace:1}},
+  q4:{nenhuma:{brise:2,epure:-1,ravin:2,cabane:2,moka:-3,audace:-3},leve:{epure:2,oree:2,ravin:1,cabane:1},marcante:{brise:-2,epure:1,ravin:-2,cabane:-1,moka:3,audace:3}},
+  q5:{amadeirado:{ravin:4,cabane:5,audace:-1},especiado:{brise:-2,oree:4,ravin:1,cabane:3,moka:5,audace:2},fresco:{brise:5,epure:2,oree:2,ravin:3,moka:-3},floral:{brise:1,epure:5,oree:-1,cabane:-2,moka:-2,audace:3},frutal:{brise:1,epure:1,oree:2,cabane:-2,moka:-2,audace:5}},
+  q6:{suave:{brise:2,epure:2,ravin:1,cabane:-1,moka:-1},medida:{oree:2,ravin:3,cabane:1},intenso:{brise:-2,epure:-1,cabane:2,moka:3,audace:2}},
+  q7:{sala:{oree:1,cabane:1,moka:1,audace:1},quarto:{brise:1,epure:1,moka:1,audace:1},banheiro:{brise:2,epure:1,oree:1,ravin:1,moka:-2,audace:-1},escritorio:{brise:1,ravin:2,cabane:1,moka:-2,audace:-1},hall:{brise:1,oree:1,ravin:1,audace:1},naosei:{}}
+};
+
+// ── STATE ─────────────────────────────────────
+let A={}, consent=false;
+
+// ── NAV ───────────────────────────────────────
+function start(){document.getElementById('intro').style.display='none';document.getElementById('prog').classList.add('on');goto(1)}
+function goto(n){document.querySelectorAll('.q').forEach(b=>b.classList.remove('on'));const b=document.getElementById('q'+n);if(b){b.classList.add('on');setProg(n);restore('q'+n);checkNext('q'+n)}}
+function setProg(n){const p=Math.round(((n-1)/TOTAL)*100);document.getElementById('prog-fill').style.width=p+'%';document.getElementById('prog-label').textContent='Pergunta '+n+' de '+TOTAL;document.getElementById('prog-pct').textContent=p+'%'}
+function pick(q,v,btn){document.querySelectorAll('#opts-'+q+' .opt').forEach(b=>b.classList.remove('on'));btn.classList.add('on');A[q]=v;checkNext(q)}
+function checkNext(q){const b=document.getElementById('next-'+q);if(b)b.classList.toggle('on',!!A[q])}
+function restore(q){const v=A[q];if(!v)return;document.querySelectorAll('#opts-'+q+' .opt').forEach(b=>{if((b.getAttribute('onclick')||'').includes("'"+v+"'"))b.classList.add('on')})}
+function toEmail(){document.querySelectorAll('.q').forEach(b=>b.classList.remove('on'));document.getElementById('prog').classList.remove('on');document.getElementById('emailStep').classList.add('on')}
+function toggleConsent(){consent=!consent;const c=document.getElementById('chk');c.classList.toggle('on',consent);c.setAttribute('aria-checked',consent)}
+
+// ── EMAIL ─────────────────────────────────────
+function submitAndReveal(){
+  const email=document.getElementById('emailIn').value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){document.getElementById('emailErr').classList.add('on');return}
+  document.getElementById('emailErr').classList.remove('on');
+  sendToSheets(email);showLoading();
+}
+function sendToSheets(email){
+  if(!SHEETS_URL||SHEETS_URL==='SUA_URL_DO_APPS_SCRIPT_AQUI')return;
+  const r=compute();
+  fetch(SHEETS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({timestamp:new Date().toISOString(),email,marketing_consent:consent?'Sim':'Não',
+      formato:A.q1||'',sensacao:A.q2||'',temperatura:A.q3||'',docura:A.q4||'',familia:A.q5||'',
+      intensidade:A.q6||'',ambiente:A.q7||'',aroma_1:r.ranked[0],aroma_2:r.ranked[1],aroma_3:r.ranked[2]
+    })}).catch(()=>{});
+}
+function showLoading(){document.getElementById('emailStep').classList.remove('on');document.getElementById('loadingStep').classList.add('on');setTimeout(showResult,1800)}
+
+// ── RESULT ────────────────────────────────────
+function productURL(aroma,fmt){const f=FORMATS[fmt]||FORMATS.difusor;return BASE+'/produtos/'+f.pre+'-'+AROMAS[aroma].slug+'-'+f.suf+'/'}
+function imgURL(aroma,fmt){return CDN+'/'+IMGS[aroma][fmt==='vela'?'vela':fmt==='spray'?'spray':'difusor']}
+
+function showResult(){
+  document.getElementById('loadingStep').classList.remove('on');
+  const r=compute(), fmt=A.q1||'difusor', W=AROMAS[r.ranked[0]];
+  document.getElementById('rName').textContent=W.name;
+  document.getElementById('rNotes').textContent=W.notes;
+  document.getElementById('rImg').src=imgURL(r.ranked[0],fmt);
+  document.getElementById('rImg').alt=W.name;
+  document.getElementById('rFamily').textContent=W.family;
+  document.getElementById('rDesc').textContent=W.desc;
+  document.getElementById('rFormat').textContent=FORMATS[fmt].label;
+  document.getElementById('rCTA').href=productURL(r.ranked[0],fmt);
+  document.getElementById('rLayers').innerHTML=`
+    <div class="r-layer"><span class="r-layer-label">Topo</span><span class="r-layer-notes">${W.topo}</span></div>
+    <div class="r-layer"><span class="r-layer-label">Corpo</span><span class="r-layer-notes">${W.corpo}</span></div>
+    <div class="r-layer"><span class="r-layer-label">Fundo</span><span class="r-layer-notes">${W.fundo}</span></div>`;
+
+  // Scent Card
+  document.getElementById('cardName').textContent=W.name;
+  document.getElementById('cardNotes').textContent=W.notes;
+  document.getElementById('cardStatement').textContent='"'+W.statement+'"';
+  document.getElementById('cardTags').textContent=W.tags;
+  document.getElementById('cardStructure').innerHTML=`
+    <div class="card-layer"><span class="card-layer-num">01</span><span class="card-layer-text">TOPO · ${W.topo}</span></div>
+    <div class="card-layer"><span class="card-layer-num">02</span><span class="card-layer-text">CORPO · ${W.corpo}</span></div>
+    <div class="card-layer"><span class="card-layer-num">03</span><span class="card-layer-text">FUNDO · ${W.fundo}</span></div>`;
+
+  // Alternatives
+  // Justificativas sem colisão: a razão do principal "reserva" o texto,
+  // e cada alternativa evita repetir uma razão já usada por outro aroma no resultado.
+  const usedJustifications=new Set();
+  const mainReason=pickJustification(r.ranked[0], usedJustifications);
+  usedJustifications.add(mainReason);
+
+  document.getElementById('altList').innerHTML=[r.ranked[1],r.ranked[2]].map(k=>{
+    const D=AROMAS[k],url=productURL(k,fmt);
+    const why=pickJustification(k, usedJustifications);
+    usedJustifications.add(why);
+    return`<div class="alt"><img class="alt-img" src="${imgURL(k,fmt)}" alt="${D.name}" loading="lazy"/><div class="alt-body"><div class="alt-name">${D.name}</div><div class="alt-notes">${D.notes}</div><div class="alt-why">${why}</div><div class="alt-desc">${D.short}</div><a class="alt-link" href="${url}" target="_blank">Comprar</a></div></div>`;
+  }).join('');
+
+  document.getElementById('resultStep').classList.add('on');
+  document.getElementById('prog').classList.add('on');
+  document.getElementById('prog-fill').style.width='100%';
+  document.getElementById('prog-label').textContent='Resultado';
+  document.getElementById('prog-pct').textContent='100%';
+}
+
+// ── SCENT CARD EXPORT ─────────────────────────
+async function captureCard(){
+  const card=document.getElementById('scentCard');
+  return html2canvas(card,{
+    scale:3.6,           // 300px × 3.6 = 1080px wide (Instagram)
+    useCORS:true,
+    backgroundColor:'#FFFFFF',
+    logging:false,
+    allowTaint:false
+  });
+}
+
+async function downloadCard(){
+  const btn=document.querySelector('.btn-card-save');
+  btn.textContent='Gerando...';btn.disabled=true;
+  try{
+    const canvas=await captureCard();
+    const link=document.createElement('a');
+    const aroma=compute().ranked[0];
+    link.download='meeve-scent-card-'+aroma+'.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+  }catch(e){console.error(e)}
+  btn.textContent='Salvar card';btn.disabled=false;
+}
+
+async function shareCard(){
+  const btn=document.querySelector('.btn-card-share');
+  btn.textContent='Preparando...';btn.disabled=true;
+  try{
+    const canvas=await captureCard();
+    canvas.toBlob(async(blob)=>{
+      const aroma=compute().ranked[0];
+      const file=new File([blob],'meeve-scent-card-'+aroma+'.png',{type:'image/png'});
+      if(navigator.share&&navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],title:'Meu Scent Card — Studio Meeve',text:'Encontrei meu aroma no Scent Match da Meeve.'});
+      }else{
+        // Fallback: download
+        const link=document.createElement('a');
+        link.download='meeve-scent-card-'+aroma+'.png';
+        link.href=canvas.toDataURL('image/png');
+        link.click();
+      }
+    },'image/png');
+  }catch(e){console.error(e)}
+  btn.textContent='Compartilhar';btn.disabled=false;
+}
+
+// ── ALGORITHM ─────────────────────────────────
+function compute(){
+  const S={brise:0,epure:0,oree:0,ravin:0,cabane:0,moka:0,audace:0};
+  ['q2','q3','q4','q5','q6','q7'].forEach(q=>{
+    const v=A[q];if(!v)return;
+    Object.entries(SCORING[q][v]||{}).forEach(([a,p])=>{if(a in S)S[a]+=p});
+  });
+  const ranked=Object.entries(S).sort((a,b)=>b[1]!==a[1]?b[1]-a[1]:TIEBREAK.indexOf(a[0])-TIEBREAK.indexOf(b[0])).map(([k])=>k);
+  return{ranked,scores:S};
+}
+
+// ── RESTART ───────────────────────────────────
+function restart(){
+  A={};consent=false;
+  document.getElementById('resultStep').classList.remove('on');
+  document.getElementById('prog').classList.remove('on');
+  document.getElementById('emailIn').value='';
+  document.getElementById('chk').classList.remove('on');
+  document.querySelectorAll('.opt').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.btn-next').forEach(b=>b.classList.remove('on'));
+  document.getElementById('intro').style.display='';
+}
+</script>
+</body>
+</html>
