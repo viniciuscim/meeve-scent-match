@@ -608,12 +608,14 @@ const SCORING = {
 
 // ── STATE ─────────────────────────────────────
 let A={}, consent=false;
+let sessionID=generateAnonID(); // ID único da sessão para rastrear respostas parciais
+let partialResponsesSent=new Set(); // Rastrear quais respostas já foram enviadas
 
 // ── NAV ───────────────────────────────────────
 function start(){document.getElementById('intro').style.display='none';document.getElementById('prog').classList.add('on');goto(1)}
 function goto(n){document.querySelectorAll('.q').forEach(b=>b.classList.remove('on'));const b=document.getElementById('q'+n);if(b){b.classList.add('on');setProg(n);restore('q'+n);checkNext('q'+n)}}
 function setProg(n){const p=Math.round(((n-1)/TOTAL)*100);document.getElementById('prog-fill').style.width=p+'%';document.getElementById('prog-label').textContent='Pergunta '+n+' de '+TOTAL;document.getElementById('prog-pct').textContent=p+'%'}
-function pick(q,v,btn){document.querySelectorAll('#opts-'+q+' .opt').forEach(b=>b.classList.remove('on'));btn.classList.add('on');A[q]=v;checkNext(q)}
+function pick(q,v,btn){document.querySelectorAll('#opts-'+q+' .opt').forEach(b=>b.classList.remove('on'));btn.classList.add('on');A[q]=v;checkNext(q);autoSavePartialResponse(q,v)}
 function checkNext(q){const b=document.getElementById('next-'+q);if(b)b.classList.toggle('on',!!A[q])}
 function restore(q){const v=A[q];if(!v)return;document.querySelectorAll('#opts-'+q+' .opt').forEach(b=>{if((b.getAttribute('onclick')||'').includes("'"+v+"'"))b.classList.add('on')})}
 function toEmail(){document.querySelectorAll('.q').forEach(b=>b.classList.remove('on'));document.getElementById('prog').classList.remove('on');document.getElementById('emailStep').classList.add('on')}
@@ -622,19 +624,77 @@ function toggleConsent(){consent=!consent;const c=document.getElementById('chk')
 // ── EMAIL ─────────────────────────────────────
 function submitAndReveal(){
   const email=document.getElementById('emailIn').value.trim();
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){document.getElementById('emailErr').classList.add('on');return}
+  // Email é OPCIONAL — validar apenas se informado
+  if(email!==''&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    document.getElementById('emailErr').classList.add('on');
+    return;
+  }
   document.getElementById('emailErr').classList.remove('on');
-  sendToSheets(email);showLoading();
+  // Se não informar email, gerar ID anônimo
+  const emailToSend=email||generateAnonID();
+  sendToSheets(emailToSend,email==='');
+  showLoading();
 }
-function sendToSheets(email){
+
+function generateAnonID(){
+  // ID único: 'anon-' + timestamp + caracteres aleatórios
+  return 'anon_'+Date.now()+'_'+Math.random().toString(36).substr(2,9);
+}
+function sendToSheets(email,isAnonymous=false,isPartial=false){
   if(!SHEETS_URL||SHEETS_URL==='SUA_URL_DO_APPS_SCRIPT_AQUI')return;
   const r=compute();
+  // Calcular progresso e número de respostas fornecidas
+  const responses=['q1','q2','q3','q4','q5','q6','q7'].filter(q=>A[q]).length;
+  const isComplete=responses===7;
+  
   fetch(SHEETS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({timestamp:new Date().toISOString(),email,marketing_consent:consent?'Sim':'Não',
+    body:JSON.stringify({
+      timestamp:new Date().toISOString(),
+      email,
+      session_id:sessionID,
+      is_anonymous:isAnonymous?'Sim':'Não',
+      is_complete:isComplete?'Sim':'Não',
+      is_partial:isPartial?'Sim':'Não',
+      responses_count:responses,
+      marketing_consent:consent?'Sim':'Não',
       formato:A.q1||'',sensacao:A.q2||'',temperatura:A.q3||'',docura:A.q4||'',familia:A.q5||'',
-      intensidade:A.q6||'',ambiente:A.q7||'',aroma_1:r.ranked[0],aroma_2:r.ranked[1],aroma_3:r.ranked[2]
+      intensidade:A.q6||'',ambiente:A.q7||'',
+      aroma_1:r.ranked[0],aroma_2:r.ranked[1],aroma_3:r.ranked[2]
     })}).catch(()=>{});
 }
+
+// Auto-salvar respostas parciais quando usuário responde
+function autoSavePartialResponse(q,v){
+  // Evitar duplicatas
+  if(partialResponsesSent.has(q+'-'+v))return;
+  partialResponsesSent.add(q+'-'+v);
+  
+  // Aguardar 2 segundos antes de enviar (debounce)
+  setTimeout(()=>{
+    sendToSheets(sessionID,true,true);
+  },2000);
+}
+
+// Enviar respostas parciais quando usuário sai da página
+window.addEventListener('beforeunload',(e)=>{
+  const responses=['q1','q2','q3','q4','q5','q6','q7'].filter(q=>A[q]).length;
+  // Só enviar se tiver pelo menos 1 resposta e não for conclusão
+  if(responses>0&&responses<7){
+    navigator.sendBeacon(SHEETS_URL,JSON.stringify({
+      timestamp:new Date().toISOString(),
+      email:sessionID,
+      session_id:sessionID,
+      is_anonymous:'Sim',
+      is_complete:'Não',
+      is_partial:'Sim',
+      responses_count:responses,
+      marketing_consent:consent?'Sim':'Não',
+      formato:A.q1||'',sensacao:A.q2||'',temperatura:A.q3||'',docura:A.q4||'',familia:A.q5||'',
+      intensidade:A.q6||'',ambiente:A.q7||'',
+      user_abandoned:'Sim'
+    }));
+  }
+});
 function showLoading(){document.getElementById('emailStep').classList.remove('on');document.getElementById('loadingStep').classList.add('on');setTimeout(showResult,1800)}
 
 // ── RESULT ────────────────────────────────────
